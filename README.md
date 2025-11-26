@@ -41,3 +41,9 @@ This approach gives you complete control over both DNS resolution and proxy rout
 ```bash
 pipx install proxydns
 ```
+
+## Uninstall
+```bash
+pipx uninstall proxydns
+pip uninstall proxydns
+```

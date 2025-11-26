@@ -8,5 +8,10 @@
         "**/__pycache__": true
     },
     "editor.minimap.enabled": true,
-    "github.copilot.enable": true
+    "github.copilot.enable": {
+        "*": false,
+        "plaintext": false,
+        "markdown": false,
+        "yaml": false
+    }
 }

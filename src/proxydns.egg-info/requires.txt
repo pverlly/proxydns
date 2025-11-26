@@ -1,0 +1,2 @@
+dnspython
+mitmproxy>=12.1.1

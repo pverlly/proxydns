@@ -1,0 +1,43 @@
+# ProxyDNS
+ProxyDNS is a CLI tool that creates a local proxy server with custom DNS resolution capabilities. It resolves domain names using your specified DNS servers before forwarding traffic through an upstream proxy, ensuring DNS queries are handled exactly where and how you want them.
+
+This tool is particularly valuable when you need to:
+- Perform DNS resolution in a specific geographic location
+- Use custom DNS servers for security or privacy reasons
+- Bypass DNS resolution issues that occur with certain proxies
+- Maintain control over the DNS resolution process in your proxy chain
+ 
+Built on `mitmproxy` for robust traffic handling and `dnspython` for reliable DNS operations.
+
+## Key Features
+- **Custom DNS Resolution**: Use any DNS servers you specify (Google, Cloudflare, private servers, etc.)
+- **Multi-Protocol Proxy Support**: Forward through HTTP, HTTPS, or SOCKS5 upstream proxies
+- **Intelligent Caching**: TTL-based DNS response caching for improved performance
+- **Flexible Authentication**: Support for both local proxy auth and upstream proxy credentials
+- **Configurable Timeouts**: Adjust DNS query timeouts to match your network conditions
+
+## Quick Start
+```bash
+# Basic usage with Google DNS and upstream proxy
+proxydns --listen-host localhost \
+         --listen-port 9000 \
+         --dns-servers 8.8.8.8,1.1.1.1 \
+         --proxy http://remote-proxy:8080 \
+         --verbose
+
+# Test your setup
+curl -x http://localhost:9000 http://ip-api.com/json
+```
+
+## How It Works
+1. **Local Proxy Setup**: Creates a local proxy server listening on your specified host/port
+2. **DNS Resolution**: Intercepts domain name requests and resolves them using your custom DNS servers
+3. **Traffic Forwarding**: Routes the resolved connections through your specified upstream proxy
+4. **Authentication Handling**: Manages credentials for both local and remote proxy authentication as needed
+
+This approach gives you complete control over both DNS resolution and proxy routing in a single, streamlined tool.
+
+## Installation
+```bash
+pipx install proxydns
+```

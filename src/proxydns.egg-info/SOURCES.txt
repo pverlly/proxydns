@@ -1,0 +1,13 @@
+LICENSE
+README.md
+pyproject.toml
+src/proxydns.egg-info/PKG-INFO
+src/proxydns.egg-info/SOURCES.txt
+src/proxydns.egg-info/dependency_links.txt
+src/proxydns.egg-info/entry_points.txt
+src/proxydns.egg-info/requires.txt
+src/proxydns.egg-info/top_level.txt
+src/proxydns_pverlly/__init__.py
+src/proxydns_pverlly/__main__.py
+src/proxydns_pverlly/proxydns.py
+src/proxydns_pverlly/test.py

@@ -1,0 +1,2 @@
+[console_scripts]
+proxydns = proxydns_pverlly.__main__:main

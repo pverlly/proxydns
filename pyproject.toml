@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools >= 77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "proxydns"
+description = "Resolves DNS names using a custom server before routing traffic through a proxy."
+version = "0.0.1"
+authors = [
+  { name="Pablo Verlly", email="pverlly@github.com" },
+]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = ["dnspython", "mitmproxy>=12.1.1"]
+
+[project.urls]
+Homepage = "https://github.com/pverlly/proxydns"
+Issues = "https://github.com/pverlly/proxydns/issues"
+
+[project.scripts]
+proxydns = "proxydns_pverlly.__main__:main"

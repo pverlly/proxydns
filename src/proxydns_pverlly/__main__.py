@@ -1,7 +1,18 @@
 # type: ignore
 import os
 import argparse
-from mitmproxy.tools.main import mitmdump
+import asyncio
+import logging
+
+from mitmproxy.tools.dump import DumpMaster
+from mitmproxy.tools import main
+
+# setup logging
+logging.basicConfig(
+  level=logging.INFO,
+  format="%(message)s",
+  datefmt="[%X]",  
+)
 
 def custom(arg_string):
     return arg_string.split(',')
@@ -30,6 +41,7 @@ parser.usage = """
 
 args = parser.parse_args()
 
+
 # store args in environment variables for access in proxydns.py
 os.environ["PROXYDNS_DNS_SERVERS"] = ','.join(args.dns_servers)
 os.environ["PROXYDNS_VERBOSE"] = "1" if args.verbose else "0"
@@ -37,22 +49,40 @@ os.environ["PROXYDNS_VERBOSE"] = "1" if args.verbose else "0"
 print(f"+ Using DNS servers: {args.dns_servers}")
 print(f"+ Forwarding traffic through proxy: {args.proxy}")
 
+async def start_mitmproxy():
+    from .proxydns import LocalDNSUpstream
+
+    master = DumpMaster(options=None, with_dumper=True, with_termlog=True)
+
+    # set options here
+    # @NOTE ref: https://docs.mitmproxy.org/stable/concepts/options/
+    master.options.set(f"mode=upstream:{args.proxy}")
+    master.options.set(f"listen_host={args.listen_host}")
+    master.options.set(f"listen_port={args.listen_port}")
+    master.options.set(f"connection_strategy=eager")
+    master.options.set(f"flow_detail=0")
+    master.options.set(f"block_global=false")
+
+    if args.remote_auth:
+        master.options.set(f"upstream_auth={args.remote_auth}")
+    if args.local_auth:
+        master.options.set(f"proxyauth={args.local_auth}")
+
+    # master.addons.add(UpstreamAuth())
+    master.addons.add(LocalDNSUpstream())
+
+    try:
+        await master.run()
+    except KeyboardInterrupt:
+        print("keyboard interrupt.")
+        master.shutdown()
+
 def main():
-    mitmproxy_args = [
-        "--listen-host", f"{args.listen_host}",
-        "--listen-port", f"{args.listen_port}",
-        "--upstream-auth", f"{args.remote_auth}" if args.remote_auth else "",
-        "--proxyauth", f"{args.local_auth}" if args.local_auth else "",
-        "--mode", f"upstream:{args.proxy}",
-        "--set", f"connection_strategy=eager",
-        "-s", "src/proxydns_pverlly/proxydns.py",
-    ]
-
-    if args.verbose:
-        print("MITMproxy arguments:")
-        print(mitmproxy_args)
-
-    mitmdump(mitmproxy_args)
+    try:
+        asyncio.run(start_mitmproxy())
+    except Exception as e:
+        print("proxydns shutdown.")
+        print(e)
 
 if __name__ == "__main__":
     main()

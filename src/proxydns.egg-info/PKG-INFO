@@ -1,15 +1,15 @@
 Metadata-Version: 2.4
 Name: proxydns
-Version: 0.0.1
+Version: 0.0.4
 Summary: Resolves DNS names using a custom server before routing traffic through a proxy.
 Author-email: Pablo Verlly <pverlly@github.com>
 Project-URL: Homepage, https://github.com/pverlly/proxydns
 Project-URL: Issues, https://github.com/pverlly/proxydns/issues
-Requires-Python: >=3.8
+Requires-Python: >=3.12
 Description-Content-Type: text/markdown
 License-File: LICENSE
 Requires-Dist: dnspython
-Requires-Dist: mitmproxy>=12.1.1
+Requires-Dist: mitmproxy==12.1.1
 Dynamic: license-file
 
 # ProxyDNS
@@ -54,4 +54,19 @@ This approach gives you complete control over both DNS resolution and proxy rout
 ## Installation
 ```bash
 pipx install proxydns
+```
+
+## Uninstall
+```bash
+pipx uninstall proxydns
+pip uninstall proxydns
+```
+
+## Build and ship
+```bash
+# 1. change version (pyproject.toml)
+# 2. build
+python -m build
+# 3. ship
+twine upload dist/*
 ```

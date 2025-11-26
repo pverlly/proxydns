@@ -1,25 +1,14 @@
 # type: ignore
-# -*- coding: utf-8 -*-
-"""
-mitmproxy add-on: upstream proxy com resolução DNS local.
-
-uso:
-    mitmproxy --mode upstream:http://username:password@gate-us.ipfoxy.io:58688 \
-              -s src/addon.py \
-              --set connection_strategy=eager
-"""
 
 import os
 import time
+import logging
 import ipaddress
 from typing import Optional
 
-from mitmproxy import http
-from mitmproxy import ctx
-from mitmproxy.connection import Connection
-
-# dnspython
 import dns.resolver
+from mitmproxy import http
+from mitmproxy.connection import Connection
 
 # retrieve config from environment variables
 PROXYDNS_DNS_SERVERS    = os.environ.get("PROXYDNS_DNS_SERVERS").split(',')
@@ -31,10 +20,9 @@ DNS_TIMEOUT = 6.0                       # segundos
 DNS_TTL_CACHE = 120.0                   # TTL simples da cache (segundos)
 RESOLVE_IPV6 = False                    # true se quiser preferir AAAA
 SKIP_SUFFIXES = (".onion",)             # domínios que NÃO devem ser resolvidos localmente
-# ---------------------------
 
 if PROXYDNS_VERBOSE:
-    ctx.log.info(f"[localdns] Configuração: DNS_SERVERS={DNS_SERVERS}, DNS_TIMEOUT={DNS_TIMEOUT}, DNS_TTL_CACHE={DNS_TTL_CACHE}, RESOLVE_IPV6={RESOLVE_IPV6}")
+    logging.info(f"[localdns] Config: DNS_SERVERS={DNS_SERVERS}, DNS_TIMEOUT={DNS_TIMEOUT}, DNS_TTL_CACHE={DNS_TTL_CACHE}, RESOLVE_IPV6={RESOLVE_IPV6}")
 
 class TTLCache:
     def __init__(self, ttl: float):
@@ -107,7 +95,7 @@ class LocalDNSUpstream:
     """
 
     def load(self, loader):
-        ctx.log.info("[localdns] Add-on carregado. DNS_SERVERS=%s" % DNS_SERVERS)
+        logging.info("[localdns] Add-on loaded. DNS_SERVERS=%s" % DNS_SERVERS)
 
     # HTTPS: intercepta o CONNECT antes de abrir o túnel ao upstream
     def http_connect(self, flow: http.HTTPFlow):
@@ -119,7 +107,7 @@ class LocalDNSUpstream:
 
         ip = local_resolve(original_host)
         if not ip:
-            ctx.log.warn(f"[localdns] Falha ao resolver {original_host}; deixando upstream resolver.")
+            logging.warning(f"[localdns] Failed to resolve {original_host}; delegating the work to the upstream.")
             return
 
         # Reescreve o CONNECT authority para IP:porta
@@ -130,7 +118,7 @@ class LocalDNSUpstream:
         flow.server_conn.sni = original_host
         flow.metadata["localdns_original_host"] = original_host
 
-        ctx.log.info(f"[localdns] CONNECT {original_host}:{original_port} -> {ip}:{original_port} (SNI={original_host})")
+        logging.info(f"[localdns] CONNECT {original_host}:{original_port} -> {ip}:{original_port} (SNI={original_host})")
 
     # HTTP: antes de enviar a request (sem CONNECT)
     def requestheaders(self, flow: http.HTTPFlow):
@@ -146,7 +134,7 @@ class LocalDNSUpstream:
 
         ip = local_resolve(original_host)
         if not ip:
-            ctx.log.warn(f"[localdns] Falha ao resolver {original_host}; deixando upstream resolver.")
+            logging.warning(f"[localdns] Failed to resolve {original_host}; delegating the work to the upstream.")
             return
 
         # Preserva o Host header original para roteamento virtual/HTTP/1.1
@@ -160,7 +148,7 @@ class LocalDNSUpstream:
         flow.request.port = original_port
         flow.metadata["localdns_original_host"] = original_host
 
-        ctx.log.info(f"[localdns] HTTP {original_host}:{original_port} -> {ip}:{original_port} (Host header preservado)")
+        logging.info(f"[localdns] HTTP {original_host}:{original_port} -> {ip}:{original_port} (Host header preserved)")
 
     # Camada de conexão ao servidor (antes de abrir o socket via upstream)
     def serverconnect(self, conn: Connection):
@@ -182,7 +170,4 @@ class LocalDNSUpstream:
             conn.sni = host
 
         conn.address = (ip, port)
-        ctx.log.info(f"[localdns] serverconnect: {host}:{port} -> {ip}:{port} (SNI={conn.sni})")
-
-
-addons = [LocalDNSUpstream()]
+        logging.info(f"[localdns] serverconnect: {host}:{port} -> {ip}:{port} (SNI={conn.sni})")

@@ -47,3 +47,12 @@ pipx install proxydns
 pipx uninstall proxydns
 pip uninstall proxydns
 ```
+
+## Build and ship
+```bash
+# 1. change version (pyproject.toml)
+# 2. build
+python -m build
+# 3. ship
+twine upload dist/*
+```

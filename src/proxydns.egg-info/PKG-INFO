@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: proxydns
-Version: 0.0.4
+Version: 0.0.5
 Summary: Resolves DNS names using a custom server before routing traffic through a proxy.
 Author-email: Pablo Verlly <pverlly@github.com>
 Project-URL: Homepage, https://github.com/pverlly/proxydns

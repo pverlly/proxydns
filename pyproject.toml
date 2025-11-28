@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "proxydns"
 description = "Resolves DNS names using a custom server before routing traffic through a proxy."
-version = "0.0.4"
+version = "0.0.5"
 authors = [
   { name="Pablo Verlly", email="pverlly@github.com" },
 ]

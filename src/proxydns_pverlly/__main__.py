@@ -25,6 +25,7 @@ parser.add_argument("-ds", "--dns-servers", type=custom,  default=["8.8.8.8"], h
 parser.add_argument("-ra", "--remote-auth", type=str,     default=None, help="Remote Proxy authentication in the format username:password.")
 parser.add_argument("-la", "--local-auth",  type=str,     default=None, help="Local mitmproxy authentication in the format username:password.")
 parser.add_argument("-p", "--proxy",        type=str,     required=True, help="Remote Proxy server to forward traffic through (e.g., http://localhost:8080).")
+parser.add_argument("-i", "--insecure", action="store_true", help="Do not verify upstream server SSL/TLS certificates.")
 parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output.")
 
 # add usage example
@@ -67,6 +68,8 @@ async def start_mitmproxy():
         master.options.set(f"upstream_auth={args.remote_auth}")
     if args.local_auth:
         master.options.set(f"proxyauth={args.local_auth}")
+    if args.insecure:
+        master.options.set(f"ssl_insecure=true")
 
     # master.addons.add(UpstreamAuth())
     master.addons.add(LocalDNSUpstream())
